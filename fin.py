@@ -1,31 +1,46 @@
-import twitter_info # still need this in the same directory, filled out
-import tweepy
+import fin_Info
 import json
 import sqlite3
+import matplotlib
 
-consumer_key = twitter_info.consumer_key
-consumer_secret = twitter_info.consumer_secret
-access_token = twitter_info.access_token
-access_token_secret = twitter_info.access_token_secret
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
-twitter_api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
+fb_api=fin_Info.fb_api_secret
 
-def get_tweets(qury):
-    CACHE_FNAME = "twitter_cache.json"
+#takes in json string, return json dictionary
+def cache_to_file(json_str,cache_file_name):
+    open('{}'.format(cache_file_name), 'w').write(json.dumps(json.loads(json_str)))
+    return (json.loads(json_str))
+
+def load_cache(cache_file_name):
     try:
-        cache_file = open(CACHE_FNAME, 'r')
+        cache_file = open(cache_file_name, 'r')
         cache_contents = cache_file.read()
         cache_file.close()
-        CACHE_DICTION = json.loads(cache_contents)
+        return (json.loads(cache_contents))
     except:
-        CACHE_DICTION = {}
-    if CACHE_DICTION == {}:
-        CACHE_DICTION = twitter_api.search(q=qury)
-        open('{}'.format(CACHE_FNAME), 'w').write(json.dumps(CACHE_DICTION))
-    else:
-        pass
-    tweelist=[]
-    for i in CACHE_DICTION['statuses']:
-        tweelist.append((i['id_str'],i['user']['screen_name'],i['created_at'],i['text'],i['retweet_count']))
-    return (tweelist) #list of list containing: id,screen name, time, text, # of retweets
+        return ('Error in loading cache {}'.format(cache_file_name))
+
+def write_to_db(db_name,api_source_name,list_of_tup_to_write):
+    conn=sqlite3.connect(db_name)
+    cur=conn.cursor()
+    cmd_create_table="CREATE TABLE `{}` (`Log_UID`	INTEGER NOT NULL,`Time`	DATETIME NOT NULL,`Unix_UTC_Time`	INTEGER NOT NULL,`User`	TEXT NOT NULL,`Activity_Measure`	INTEGER NOT NULL);".format(api_source_name)
+    try:
+        cur.execute(cmd_create_table)
+        conn.commit()
+        print('Created table for {}'.format(api_source_name))
+    except:
+        print('Table for {} already exists'.format(api_source_name))
+    cmd_insert_value="INSERT INTO {} VALUES ?".format(api_source_name)
+    for tup in list_of_tup_to_write:
+        cur.execute(cmd_insert_value,tup)
+        conn.commit()
+    cur.close()
+    conn.close()
+
+def load_db_to_list(db_name,api_source_name):
+    conn=sqlite3.connect(db_name)
+    cur=conn.cursor()
+    cmd_load="SELECT * FROM {} ORDER BY Unix_UTC_Time ASC"
+    quoted_tuple=cur.execute(cmd_load)
+    cur.close()
+    conn.close()
+
