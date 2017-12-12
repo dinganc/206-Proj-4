@@ -6,7 +6,12 @@ import requests.auth
 import time
 import os
 import datetime
-import matplotlib
+import pandas
+import matplotlib.pyplot as plt
+import numpy as np
+#import plotly.plotly as py
+#import plotly.tools as tls
+from wordcloud import WordCloud
 
 day_of_the_week={
     0:'Mon 12am - 6am',
@@ -50,7 +55,7 @@ def check_time_point(unix_stamp):
 #takes in json string, return json dictionary after caching into a file, named after the supplied file name
 def cache_to_file(json_str,cache_file_name,apiname):
     if not os.path.exists('{}'.format(apiname)):os.makedirs('{}'.format(apiname))
-    open('{}'.format(apiname+'\\'+cache_file_name), 'w',encoding='utf-8').write(json_str)#create/ over write the cache file with json string
+    open('{}'.format(apiname+'//'+cache_file_name), 'w',encoding='utf-8').write(json_str)#create/ over write the cache file with json string
 
 #try to load the cache into python object, if failed, it will return the error message
 def load_cache(cache_file_name):
@@ -66,7 +71,7 @@ def load_cache(cache_file_name):
 def write_to_db(db_name,api_source_name,list_of_tup_to_write):
     conn=sqlite3.connect(db_name)
     cur=conn.cursor()
-    cmd_create_table="CREATE TABLE `{}` (`Log_UID`	INTEGER NOT NULL,`Day`	TEXT NOT NULL,`Unix_UTC_Time`	INTEGER NOT NULL,`Text_Note`	TEXT NOT NULL,`Activity_Measure`	INTEGER NOT NULL);".format(api_source_name)
+    cmd_create_table="CREATE TABLE `{}` (`Log_UID`	TEXT NOT NULL UNIQUE,`Day`	TEXT NOT NULL,`Unix_UTC_Time`	INTEGER NOT NULL,`Text_Note`	TEXT NOT NULL,`Activity_Measure`	INTEGER NOT NULL,PRIMARY KEY(`Log_UID`));".format(api_source_name)
     try:
         cur.execute(cmd_create_table)
         conn.commit()
@@ -75,16 +80,19 @@ def write_to_db(db_name,api_source_name,list_of_tup_to_write):
         print('Table for {} already exists'.format(api_source_name))
     cmd_insert_value="INSERT INTO {} VALUES (?,?,?,?,?)".format(api_source_name)
     for tup in list_of_tup_to_write:
-        cur.execute(cmd_insert_value,tup)
-        conn.commit()
+        try:
+            cur.execute(cmd_insert_value,tup)
+            conn.commit()
+        except:
+            pass
     cur.close()
     conn.close()
 
-def load_db_to_list(db_name,api_source_name):
+def load_db_to_list(db_name,api_source_name,param_name):
     conn=sqlite3.connect(db_name)
     cur=conn.cursor()
-    cmd_load="SELECT * FROM {} ORDER BY Unix_UTC_Time ASC".format(api_source_name)
-    quoted_tuple=cur.execute(cmd_load)
+    cmd_load="SELECT {} FROM {} ORDER BY Unix_UTC_Time ASC".format(param_name,api_source_name)
+    quoted_tuple=cur.execute(cmd_load).fetchall()
     cur.close()
     conn.close()
     return quoted_tuple
@@ -109,7 +117,7 @@ def reddit_access(load_turns,wait_interval,cache_toggle):
         for i in first_page['data']['children']:
             try:
                 posts.append((i['data']['url'], check_time_point(i['data']['created_utc']), i['data']['created_utc'],
-                              i['data']['author'],
+                              i['data']['title'],
                               i['data']['num_comments']))
             except:
                 pass
@@ -124,26 +132,27 @@ def reddit_access(load_turns,wait_interval,cache_toggle):
             for i in next_page['data']['children']:
                 try:
                     posts.append((i['data']['url'], check_time_point(i['data']['created_utc']), i['data']['created_utc'],
-                                  i['data']['author'],
+                                  i['data']['title'],
                                   i['data']['num_comments']))
                 except:
                     pass
 
     else:
-        for i in [i for i in os.walk([os.getcwd()][0] + '\\' + 'reddit')][0][2]:
-            page=load_cache('reddit'+'\\'+i)
+        for i in [i for i in os.walk([os.getcwd()][0] + '//' + 'reddit')][0][2]:
+            page=load_cache('reddit'+'//'+i)
             for i in page['data']['children']:
                 try:
-                    posts.append((i['data']['url'], check_time_point(i['data']['created_utc']), i['data']['created_utc'], i['data']['author'],
+                    posts.append((i['data']['url'], check_time_point(i['data']['created_utc']), i['data']['created_utc'], i['data']['title'],
                            i['data']['num_comments']))
                 except:
                     pass
 
     print(len(sorted(set(posts),key=lambda x:x[2])))
-    return sorted(set(posts), key=lambda x: x[2])
+    return sorted(set(posts), key=lambda x: x[2])[:100]
 
 def APIXU_access(load_turns,wait_interval,cache_toggle):
     posts=[]
+    counter = 0
     if cache_toggle==False:
         dates=[]
         for i in range(0,load_turns+1):
@@ -155,21 +164,28 @@ def APIXU_access(load_turns,wait_interval,cache_toggle):
             time.sleep(wait_interval)
             cache_to_file(first_page_str, 'APIXU_Day_{}'.format(i), 'APIXU')
             for hour in first_page['forecast']['forecastday'][0]['hour']:
-                try:
-                    posts.append((hour['time'],check_time_point(hour['time_epoch']),hour['time_epoch'],hour['condition']['text'],hour['temp_f']))
-                except:
-                    pass
+                if counter%3==0:
+                    try:
+                        posts.append((hour['time'],check_time_point(hour['time_epoch']),hour['time_epoch'],hour['condition']['text'],hour['temp_f']))
+                        counter+=1
+                    except:
+                        counter += 1
+                else:
+                    counter += 1
     else:
-        for i in [i for i in os.walk([os.getcwd()][0] + '\\' + 'APIXU')][0][2]:
-            page=load_cache('APIXU'+'\\'+i)
+        for i in [i for i in os.walk([os.getcwd()][0] + '//' + 'APIXU')][0][2]:
+            page=load_cache('APIXU'+'//'+i)
             for hour in page['forecast']['forecastday'][0]['hour']:
-                try:
-                    posts.append((hour['time'],check_time_point(hour['time_epoch']),hour['time_epoch'],hour['condition']['text'],hour['temp_f']))
-                except:
-                    pass
-
+                if counter%3==0:
+                    try:
+                        posts.append((hour['time'],check_time_point(hour['time_epoch']),hour['time_epoch'],hour['condition']['text'],hour['temp_f']))
+                        counter+=1
+                    except:
+                        counter += 1
+                else:
+                    counter += 1
     print(len(sorted(set(posts), key=lambda x: x[2])))
-    return sorted(set(posts), key=lambda x: x[2])
+    return sorted(set(posts), key=lambda x: x[2])[-100:]
 
 def facebook_access(load_turns,wait_interval,cache_toggle):
     posts=[]
@@ -251,9 +267,9 @@ def facebook_access(load_turns,wait_interval,cache_toggle):
                               0))
 
     else:
-        for i in [i for i in os.walk([os.getcwd()][0] + '\\' + 'facebook')][0][2]:
+        for i in [i for i in os.walk([os.getcwd()][0] + '//' + 'facebook')][0][2]:
             if 'likes' in i:
-                page=load_cache('facebook'+'\\'+i)
+                page=load_cache('facebook'+'//'+i)
                 for i in page['data']:
                     try:
                         posts.append((i['id'], check_time_point(
@@ -268,7 +284,7 @@ def facebook_access(load_turns,wait_interval,cache_toggle):
                                       '',
                                       0))
             if 'feed' in i:
-                page = load_cache('facebook' + '\\' + i)
+                page = load_cache('facebook' + '//' + i)
                 for i in page['data']:
                     try:
                         posts.append((i['id'], check_time_point(
@@ -283,7 +299,7 @@ def facebook_access(load_turns,wait_interval,cache_toggle):
                                       '',
                                       0))
             if 'events' in i:
-                page = load_cache('facebook' + '\\' + i)
+                page = load_cache('facebook' + '//' + i)
                 for i in page['data']:
                     try:
                         posts.append((i['id'], check_time_point(
@@ -299,7 +315,7 @@ def facebook_access(load_turns,wait_interval,cache_toggle):
                                       0))
 
     print(len(sorted(set(posts),key=lambda x:x[2])))
-    return sorted(set(posts), key=lambda x: x[2])
+    return sorted(set(posts), key=lambda x: x[2])[:100]
 
 def pinterest_access(load_turns,wait_interval,cache_toggle):
     posts=[]
@@ -325,7 +341,7 @@ def pinterest_access(load_turns,wait_interval,cache_toggle):
             first_page_str = requests.get(initial_req_new_posts).text
             first_page = json.loads(first_page_str)
             time.sleep(wait_interval)
-            cache_to_file(first_page_str, 'pinterest_pins_page_'.format(k), 'pinterest')
+            cache_to_file(first_page_str, 'pinterest_pins_page_{}'.format(k), 'pinterest')
             k+=1
             for i in first_page['data']:
                 try:
@@ -338,8 +354,8 @@ def pinterest_access(load_turns,wait_interval,cache_toggle):
                     pass
             next_page = first_page['page']['next']
     else:
-        for i in [i for i in os.walk([os.getcwd()][0] + '\\' + 'pinterest')][0][2]:
-            page = load_cache('pinterest' + '\\' + i)
+        for i in [i for i in os.walk([os.getcwd()][0] + '//' + 'pinterest')][0][2]:
+            page = load_cache('pinterest' + '//' + i)
             for i in page['data']:
                 try:
                     posts.append((i['id'], check_time_point(
@@ -351,7 +367,7 @@ def pinterest_access(load_turns,wait_interval,cache_toggle):
                     pass
 
     print(len(sorted(set(posts), key=lambda x: x[2])))
-    return sorted(set(posts), key=lambda x: x[2])
+    return sorted(set(posts), key=lambda x: x[2])[:100]
 
 def github_access(load_turns,wait_interval,cache_toggle):
     posts=[]
@@ -371,8 +387,8 @@ def github_access(load_turns,wait_interval,cache_toggle):
             except Exception as ex:
                 print(ex)
     else:
-        for i in [i for i in os.walk([os.getcwd()][0] + '\\' + 'github')][0][2]:
-            page=load_cache('github'+'\\'+i)
+        for i in [i for i in os.walk([os.getcwd()][0] + '//' + 'github')][0][2]:
+            page=load_cache('github'+'//'+i)
             for i in page['items']:
                 try:
                     posts.append((i['id'], check_time_point(
@@ -383,12 +399,12 @@ def github_access(load_turns,wait_interval,cache_toggle):
                 except Exception as ex:
                     print(ex)
     print(len(sorted(set(posts), key=lambda x: x[2])))
-    return sorted(set(posts), key=lambda x: x[2])
+    return sorted(set(posts), key=lambda x: x[2])[:100]
 
 try:reddit_list=reddit_access(4,1,True)
 except:reddit_list=reddit_access(4,1,False)
-try:weather_list=APIXU_access(17,1,True)
-except:weather_list=APIXU_access(17,1,False)
+try:weather_list=APIXU_access(20,1,True)
+except:weather_list=APIXU_access(20,1,False)
 try:fb_list=facebook_access(4,1,True)
 except:fb_list=facebook_access(4,1,False)
 try:pt_list=pinterest_access(4,1,True)
@@ -402,3 +418,101 @@ write_to_db('proj4.db','facebook',fb_list)
 write_to_db('proj4.db','pinterest',pt_list)
 write_to_db('proj4.db','github',gt_list)
 
+table_list=['reddit','facebook','pinterest','github','weather']
+time_point_list=[i[1] for i in sorted(day_of_the_week.items(),key=lambda x:x[0])]
+api_activity_timepoints={}
+for j in table_list:
+    if j != 'weather':
+        count_activity={}
+        for m in time_point_list:
+            count_activity[m]=0
+        for k in load_db_to_list('proj4.db',j,'Day'):
+            count_activity[k[0]]+=1
+        api_activity_timepoints[j]=[count_activity[i] for i in time_point_list]
+    if j =='weather':
+        count_activity={}
+        for m in time_point_list:
+            count_activity[m]=[]
+        for k in load_db_to_list('proj4.db',j,'Day,Activity_Measure'):
+            count_activity[k[0]].append(k[1])
+        api_activity_timepoints[j]=[sum(count_activity[i])/(len(count_activity[i])) for i in time_point_list]
+
+api_data=pandas.DataFrame([api_activity_timepoints[i] for i in table_list],index=table_list,columns=time_point_list)
+print(api_data)
+
+axes_fig1 = []
+fig1 = plt.figure(figsize=(12, 12))
+axes_fig1.append(plt.subplot2grid(shape=(2, 1), loc=(0, 0), rowspan=(1), colspan=(1)))
+axes_fig1.append(plt.subplot2grid(shape=(2, 1), loc=(1, 0), rowspan=(1), colspan=(1)))
+
+axes_fig1[1].pcolor(api_data.loc[api_data.index.isin(['reddit','github'])], cmap=plt.cm.Blues)
+axes_fig1[1].set_yticklabels(['reddit','github'], minor=False)
+axes_fig1[1].set_xticklabels(time_point_list, minor=False,rotation = 90)
+axes_fig1[1].set_yticks(np.arange(api_data.loc[api_data.index.isin(['reddit','github'])].shape[0])+0.5, minor=False)
+axes_fig1[1].set_xticks(np.arange(api_data.loc[api_data.index.isin(['reddit','github'])].shape[1])+0.5, minor=False)
+
+axes_fig1[0].pcolor(api_data.loc[api_data.index.isin(['facebook','pinterest'])], cmap=plt.cm.Blues)
+axes_fig1[0].set_yticklabels(['facebook','pinterest'], minor=False)
+axes_fig1[0].set_xticklabels([])
+axes_fig1[0].set_yticks(np.arange(api_data.loc[api_data.index.isin(['facebook','pinterest'])].shape[0])+0.5, minor=False)
+axes_fig1[0].set_xticks(np.arange(api_data.loc[api_data.index.isin(['facebook','pinterest'])].shape[1])+0.5, minor=False)
+
+axes_fig1[0].set_title('Activity for Myself')
+axes_fig1[1].set_title('Activity for All UMich Users')
+fig1.suptitle('Activity Heatmap Comparison', fontsize=14, fontweight='bold')
+fig1.savefig("Activity Heatmap Comparison")
+
+axes_fig2 = []
+fig2 = plt.figure(figsize=(12, 12))
+axes_fig2.append(plt.subplot2grid(shape=(2, 1), loc=(0, 0), rowspan=(1), colspan=(1)))
+axes_fig2.append(plt.subplot2grid(shape=(2, 1), loc=(1, 0), rowspan=(1), colspan=(1)))
+axes_fig2.append(axes_fig2[0].twinx())
+axes_fig2.append(axes_fig2[1].twinx())
+api_data.loc[api_data.index.isin(['weather'])].transpose().plot(ax=axes_fig2[2],color='#2B9D36')
+api_data.loc[api_data.index.isin(['weather'])].transpose().plot(ax=axes_fig2[3],color='#2B9D36')
+
+axes_fig2[2].set_xticklabels([])
+vals = axes_fig2[2].get_yticks()
+axes_fig2[2].set_yticklabels(['{} °F'.format(x) for x in vals])
+axes_fig2[2].set_xticks([])
+axes_fig2[2].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+axes_fig2[3].set_xticklabels([])
+vals = axes_fig2[3].get_yticks()
+axes_fig2[3].set_yticklabels(['{} °F'.format(x) for x in vals])
+axes_fig2[3].set_xticks([])
+axes_fig2[3].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+api_data.loc[api_data.index.isin(['facebook','pinterest'])].transpose().plot(ax=axes_fig2[0],kind='bar')
+api_data.loc[api_data.index.isin(['reddit','github'])].transpose().plot(ax=axes_fig2[1],kind='bar')
+
+axes_fig2[1].set_xticklabels(time_point_list, minor=False,rotation = 90)
+vals = axes_fig2[1].get_yticks()
+axes_fig2[1].set_yticklabels(['{} Interaction(s)'.format(int(x)) for x in vals])
+
+axes_fig2[0].set_xticklabels([])
+vals = axes_fig2[0].get_yticks()
+axes_fig2[0].set_yticklabels(['{} Interaction(s)'.format(int(x)) for x in vals])
+axes_fig2[0].set_xticks([])
+
+axes_fig2[0].set_title('Activity for Myself')
+axes_fig2[1].set_title('Activity for All UMich Users')
+fig2.suptitle('Temperature Impact on Activity Level', fontsize=14, fontweight='bold')
+
+fig2.savefig('Temperature Impact on Activity Level')
+
+reddit_word_list=[]
+for k in load_db_to_list('proj4.db','reddit','Text_Note'):
+    for j in k[0].split():reddit_word_list.append(''.join(e for e in j if e.isalnum()))
+
+axes_fig3=[]
+fig3 = plt.figure(figsize=(12, 12))
+axes_fig3.append(plt.subplot2grid(shape=(1, 1), loc=(0, 0), rowspan=(1), colspan=(1)))
+wordcloud = WordCloud(width=1200, height=1200).generate(" ".join(reddit_word_list))
+axes_fig3[0].imshow(wordcloud)
+axes_fig3[0].axis("off")
+fig3.suptitle('World Cloud for UM Subreddit', fontsize=14, fontweight='bold')
+fig3.savefig('World Cloud for UM Subreddit')
+
+#py.sign_in(fin_Info.plotly_user_name, fin_Info.plotly_API_key)
+#unique_url1 = py.plot_mpl(fig3
