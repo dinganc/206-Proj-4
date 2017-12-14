@@ -77,7 +77,7 @@ def load_cache(cache_file_name):
     except Exception as ex:
         print(ex)
         return ('Error in loading cache {}'.format(cache_file_name))#print the name of the cache file if didn't load anything (becaue cache file does not exist)
-
+#this function will save the data tuple to the database
 def write_to_db(db_name,api_source_name,list_of_tup_to_write):#conviniently takes in a list of entry that needs to write and write it to the table named after the api
     conn=sqlite3.connect(db_name)#connects to the database
     cur=conn.cursor()
@@ -103,7 +103,7 @@ def write_to_db(db_name,api_source_name,list_of_tup_to_write):#conviniently take
             pass
     cur.close()
     conn.close()
-
+#this funtion is used later for graphing, when I need to pull data for each of the data sources
 def load_db_to_list(db_name,api_source_name,param_name):# used later in the visualization process to pull data from the database
     conn=sqlite3.connect(db_name)
     cur=conn.cursor()
@@ -112,7 +112,7 @@ def load_db_to_list(db_name,api_source_name,param_name):# used later in the visu
     cur.close()
     conn.close()
     return quoted_tuple#return the tuple
-
+#the below function calls reddit api,cache the json string, parse the important information and returns these information in nested tuple
 def reddit_access(load_turns,wait_interval,cache_toggle):
     posts=[]# this is the list of tuple that will be passed into the write to database function
 
@@ -165,7 +165,7 @@ def reddit_access(load_turns,wait_interval,cache_toggle):
 
     print(len(sorted(set(posts),key=lambda x:x[2])))#checking if get 100 entries
     return sorted(set(posts), key=lambda x: x[2])[:100]#cut for exact 100 entries
-
+#the below function calls APIXU api for weather data,cache the json string, parse the important information and returns these information in nested tuple
 def APIXU_access(load_turns,wait_interval,cache_toggle):
     posts=[]
     counter = 0
@@ -202,7 +202,7 @@ def APIXU_access(load_turns,wait_interval,cache_toggle):
                     counter += 1
     print(len(sorted(set(posts), key=lambda x: x[2])))
     return sorted(set(posts), key=lambda x: x[2])[-100:]
-
+#the below function calls facebook api,cache the json string, parse the important information and returns these information in nested tuple
 def facebook_access(load_turns,wait_interval,cache_toggle):
     posts=[]
     # for facebook, I can only access my own data, so I pulled my data from multiple sources such as posts, events, and stuff I liked
@@ -332,7 +332,7 @@ def facebook_access(load_turns,wait_interval,cache_toggle):
 
     print(len(sorted(set(posts),key=lambda x:x[2])))
     return sorted(set(posts), key=lambda x: x[2])[:100]
-
+#the below function calls pinterest api,cache the json string, parse the important information and returns these information in nested tuple
 def pinterest_access(load_turns,wait_interval,cache_toggle):
     posts=[]
     #pinterest is similar to facebook as I can only access my own data
@@ -385,7 +385,7 @@ def pinterest_access(load_turns,wait_interval,cache_toggle):
 
     print(len(sorted(set(posts), key=lambda x: x[2])))
     return sorted(set(posts), key=lambda x: x[2])[:100]
-
+#the below function calls github api,cache the json string, parse the important information and returns these information in nested tuple
 def github_access(load_turns,wait_interval,cache_toggle):
     posts=[]
     if cache_toggle==False:#similar caching mechanism like above
@@ -435,72 +435,72 @@ write_to_db('proj4.db','facebook',fb_list)
 write_to_db('proj4.db','pinterest',pt_list)
 write_to_db('proj4.db','github',gt_list)
 
-table_list=['reddit','facebook','pinterest','github','weather']#
-time_point_list=[i[1] for i in sorted(day_of_the_week.items(),key=lambda x:x[0])]
-api_activity_timepoints={}
-for j in table_list:
-    if j != 'weather':
+table_list=['reddit','facebook','pinterest','github','weather']#the names of the api and the tables in the database
+time_point_list=[i[1] for i in sorted(day_of_the_week.items(),key=lambda x:x[0])]# the diferrent time points throughout the day (ex:6am-12pm Monday)
+api_activity_timepoints={}#use the dictionary to count how many activityies do each time point have
+for j in table_list:#iterating through all the tables/apis
+    if j != 'weather':#if the table/ api is not weather. For the weather one, the activity measure is actuall temperature
         count_activity={}
         for m in time_point_list:
             count_activity[m]=0
         for k in load_db_to_list('proj4.db',j,'Day'):
-            count_activity[k[0]]+=1
-        api_activity_timepoints[j]=[count_activity[i] for i in time_point_list]
-    if j =='weather':
+            count_activity[k[0]]+=1#count how many activities are here
+        api_activity_timepoints[j]=[count_activity[i] for i in time_point_list]#store it to the dictionary, using the name of the api as the key
+    if j =='weather':# if the table is for the weather data, we want to calculate the average temeprature for the timepoint instead of total degrees of temperature (which makes no sense)
         count_activity={}
         for m in time_point_list:
-            count_activity[m]=[]
+            count_activity[m]=[]# the count activity is like a bucket that holds the temeprature data points for the same time point
         for k in load_db_to_list('proj4.db',j,'Day,Activity_Measure'):
-            count_activity[k[0]].append(k[1])
-        api_activity_timepoints[j]=[sum(count_activity[i])/(len(count_activity[i])) for i in time_point_list]
+            count_activity[k[0]].append(k[1])#appending the temeparture to the list
+        api_activity_timepoints[j]=[sum(count_activity[i])/(len(count_activity[i])) for i in time_point_list]#taking the average temeprature of that list
 
-api_data=pandas.DataFrame([api_activity_timepoints[i] for i in table_list],index=table_list,columns=time_point_list)
-print(api_data)
+api_data=pandas.DataFrame([api_activity_timepoints[i] for i in table_list],index=table_list,columns=time_point_list)# loading all the data into the pandas data frame for graphing
+print(api_data)# print the pandas dataframe just to make sure everything looks right
 
-axes_fig1 = []
-fig1 = plt.figure(figsize=(12, 12))
-axes_fig1.append(plt.subplot2grid(shape=(2, 1), loc=(0, 0), rowspan=(1), colspan=(1)))
-axes_fig1.append(plt.subplot2grid(shape=(2, 1), loc=(1, 0), rowspan=(1), colspan=(1)))
+axes_fig1 = []#the axes for the first figure, which is the heatmap
+fig1 = plt.figure(figsize=(12, 12))#set the size
+axes_fig1.append(plt.subplot2grid(shape=(2, 1), loc=(0, 0), rowspan=(1), colspan=(1)))#initiation for the top subplot
+axes_fig1.append(plt.subplot2grid(shape=(2, 1), loc=(1, 0), rowspan=(1), colspan=(1)))#for the bottom subplot
 
-axes_fig1[1].pcolor(api_data.loc[api_data.index.isin(['reddit','github'])], cmap=plt.cm.Blues)
-axes_fig1[1].set_yticklabels(['reddit','github'], minor=False)
-axes_fig1[1].set_xticklabels(time_point_list, minor=False,rotation = 90)
-axes_fig1[1].set_yticks(np.arange(api_data.loc[api_data.index.isin(['reddit','github'])].shape[0])+0.5, minor=False)
-axes_fig1[1].set_xticks(np.arange(api_data.loc[api_data.index.isin(['reddit','github'])].shape[1])+0.5, minor=False)
+axes_fig1[1].pcolor(api_data.loc[api_data.index.isin(['reddit','github'])], cmap=plt.cm.Blues)#plotting the bottom subplot in heat map.
+axes_fig1[1].set_yticklabels(['reddit','github'], minor=False)#set the y axis label
+axes_fig1[1].set_xticklabels(time_point_list, minor=False,rotation = 90)#set the x axis label and rotate by 90 degress, so the text won't overlap
+axes_fig1[1].set_yticks(np.arange(api_data.loc[api_data.index.isin(['reddit','github'])].shape[0])+0.5, minor=False)# set the ticks/interval for y axis
+axes_fig1[1].set_xticks(np.arange(api_data.loc[api_data.index.isin(['reddit','github'])].shape[1])+0.5, minor=False)#for x axis
 
-axes_fig1[0].pcolor(api_data.loc[api_data.index.isin(['facebook','pinterest'])], cmap=plt.cm.Blues)
-axes_fig1[0].set_yticklabels(['facebook','pinterest'], minor=False)
-axes_fig1[0].set_xticklabels([])
+axes_fig1[0].pcolor(api_data.loc[api_data.index.isin(['facebook','pinterest'])], cmap=plt.cm.Blues)#plot the top subplot
+axes_fig1[0].set_yticklabels(['facebook','pinterest'], minor=False)# set y axis label
+axes_fig1[0].set_xticklabels([])#because the x ticks will be the same for the two subplot, so I removed the x labels for the chart on top to make the graph clean
 axes_fig1[0].set_yticks(np.arange(api_data.loc[api_data.index.isin(['facebook','pinterest'])].shape[0])+0.5, minor=False)
 axes_fig1[0].set_xticks(np.arange(api_data.loc[api_data.index.isin(['facebook','pinterest'])].shape[1])+0.5, minor=False)
 
-axes_fig1[0].set_title('Activity for Myself')
-axes_fig1[1].set_title('Activity for All UMich Users')
-fig1.suptitle('Activity Heatmap Comparison', fontsize=14, fontweight='bold')
-fig1.savefig("Activity Heatmap Comparison")
+axes_fig1[0].set_title('Activity for Myself')#add a title to the top plot
+axes_fig1[1].set_title('Activity for All UMich Users')# add title to the bottom plot
+fig1.suptitle('Activity Heatmap Comparison', fontsize=14, fontweight='bold')#add title for the entire graph
+fig1.savefig("Activity Heatmap Comparison")#save the graph
 
 axes_fig2 = []
 fig2 = plt.figure(figsize=(12, 12))
 axes_fig2.append(plt.subplot2grid(shape=(2, 1), loc=(0, 0), rowspan=(1), colspan=(1)))
-axes_fig2.append(plt.subplot2grid(shape=(2, 1), loc=(1, 0), rowspan=(1), colspan=(1)))
-axes_fig2.append(axes_fig2[0].twinx())
-axes_fig2.append(axes_fig2[1].twinx())
-api_data.loc[api_data.index.isin(['weather'])].transpose().plot(ax=axes_fig2[2],color='#2B9D36')
+axes_fig2.append(plt.subplot2grid(shape=(2, 1), loc=(1, 0), rowspan=(1), colspan=(1)))#same as above, setting up sub plots and specify positions
+axes_fig2.append(axes_fig2[0].twinx())# I want to overlay the temerature line chart over the activity bar chart, so the twin ax creates the overlapping axis which I can use to plot temeprature
+axes_fig2.append(axes_fig2[1].twinx())#I got two subplots, so I create two twin axes to plot temeprature for each of the subplots
+api_data.loc[api_data.index.isin(['weather'])].transpose().plot(ax=axes_fig2[2],color='#2B9D36')#plot temeprature
 api_data.loc[api_data.index.isin(['weather'])].transpose().plot(ax=axes_fig2[3],color='#2B9D36')
 
 axes_fig2[2].set_xticklabels([])
 vals = axes_fig2[2].get_yticks()
-axes_fig2[2].set_yticklabels(['{} °F'.format(x) for x in vals])
+axes_fig2[2].set_yticklabels(['{} °F'.format(x) for x in vals])#format y axis labels so people can know the units is in degrees
 axes_fig2[2].set_xticks([])
-axes_fig2[2].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+axes_fig2[2].legend(loc='center left', bbox_to_anchor=(1, 0.5))#move the legend a little bit so it won;t overlap with the bar chart legend
 
 axes_fig2[3].set_xticklabels([])
 vals = axes_fig2[3].get_yticks()
 axes_fig2[3].set_yticklabels(['{} °F'.format(x) for x in vals])
 axes_fig2[3].set_xticks([])
-axes_fig2[3].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+axes_fig2[3].legend(loc='center left', bbox_to_anchor=(1, 0.5))#same formatting for the temperature plot
 
-api_data.loc[api_data.index.isin(['facebook','pinterest'])].transpose().plot(ax=axes_fig2[0],kind='bar')
+api_data.loc[api_data.index.isin(['facebook','pinterest'])].transpose().plot(ax=axes_fig2[0],kind='bar')#plotting bar graph on the subplots
 api_data.loc[api_data.index.isin(['reddit','github'])].transpose().plot(ax=axes_fig2[1],kind='bar')
 
 axes_fig2[1].set_xticklabels(time_point_list, minor=False,rotation = 90)
@@ -510,26 +510,28 @@ axes_fig2[1].set_yticklabels(['{} Interaction(s)'.format(int(x)) for x in vals])
 axes_fig2[0].set_xticklabels([])
 vals = axes_fig2[0].get_yticks()
 axes_fig2[0].set_yticklabels(['{} Interaction(s)'.format(int(x)) for x in vals])
-axes_fig2[0].set_xticks([])
+axes_fig2[0].set_xticks([])# formatting tthe bar graph subplots, same as the first heat map plot, I removed the x axis label for the top subplot to make the graph clearn
 
 axes_fig2[0].set_title('Activity for Myself')
 axes_fig2[1].set_title('Activity for All UMich Users')
 fig2.suptitle('Temperature Impact on Activity Level', fontsize=14, fontweight='bold')
 
-fig2.savefig('Temperature Impact on Activity Level')
+fig2.savefig('Temperature Impact on Activity Level')# save the plot
 
-reddit_word_list=[]
-for k in load_db_to_list('proj4.db','reddit','Text_Note'):
-    for j in k[0].split():reddit_word_list.append(''.join(e for e in j if e.isalnum()))
+reddit_word_list=[]# prepare a list to collect all the words in the reddit database
+for k in load_db_to_list('proj4.db','reddit','Text_Note'):# load the Text_Note column for all entries in the reddit table
+    for j in k[0].split():reddit_word_list.append(''.join(e for e in j if e.isalnum()))#first split each text note with space to get the words (stored as j), the for each
+    #character in j, I check if the character is alpha numeric to remove special characters. Then I re-join all the alpha numeric characters to get the cleaned words
+    #then append the word to the word list
 
 axes_fig3=[]
 fig3 = plt.figure(figsize=(12, 12))
-axes_fig3.append(plt.subplot2grid(shape=(1, 1), loc=(0, 0), rowspan=(1), colspan=(1)))
-wordcloud = WordCloud(width=1200, height=1200).generate(" ".join(reddit_word_list))
-axes_fig3[0].imshow(wordcloud)
-axes_fig3[0].axis("off")
+axes_fig3.append(plt.subplot2grid(shape=(1, 1), loc=(0, 0), rowspan=(1), colspan=(1)))#same proceedure of setting up the plot
+wordcloud = WordCloud(width=1200, height=1200).generate(" ".join(reddit_word_list))#word cloud module only plot a string, so I join the words back to a single string
+axes_fig3[0].imshow(wordcloud)#save the world cloud plot to the subplot
+axes_fig3[0].axis("off")#word cloud does not need axis labels
 fig3.suptitle('World Cloud for UM Subreddit', fontsize=14, fontweight='bold')
 fig3.savefig('World Cloud for UM Subreddit')
 
 #py.sign_in(fin_Info.plotly_user_name, fin_Info.plotly_API_key)
-#unique_url1 = py.plot_mpl(fig3
+#unique_url1 = py.plot_mpl(fig3# I tried to use plotly, however, plotly does not support word  cloud, so I used the tactic of saving the plot as a png file

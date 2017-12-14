@@ -1,34 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e58c7d94-c8fb-47c4-80b2-348d5398d857" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-11" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/Fin Proj.iml" afterPath="$PROJECT_DIR$/.idea/Fin Proj.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-20" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-20" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-21" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-21" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-22" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-22" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-23" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-23" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-24" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-24" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-25" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-25" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-26" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-26" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-27" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-27" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-28" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-28" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-29" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-29" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-30" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-11-30" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-01" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-01" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-02" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-02" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-03" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-03" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-04" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-04" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-05" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-05" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-06" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-06" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-07" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-07" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-08" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-08" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-09" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-09" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-10" afterPath="$PROJECT_DIR$/APIXU/APIXU_Day_2017-12-10" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fin.py" afterPath="$PROJECT_DIR$/fin.py" />
-    </list>
+    <list default="true" id="e58c7d94-c8fb-47c4-80b2-348d5398d857" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -48,13 +21,13 @@
       <file leaf-file-name="fin.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fin.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="426" column="38" lean-forward="true" selection-start-line="426" selection-start-column="38" selection-end-line="426" selection-end-column="38" />
+            <state relative-caret-position="-1414">
+              <caret line="13" column="31" lean-forward="false" selection-start-line="13" selection-start-column="31" selection-end-line="13" selection-end-column="31" />
               <folding>
                 <element signature="e#0#91#0" expanded="true" />
-                <marker date="1513145730417" expanded="true" signature="4811:4999" ph="CREATE TABLE... missing_value" />
-                <marker date="1513145730417" expanded="true" signature="5891:5924" ph="INSERT INTO missing_value... " />
-                <marker date="1513145730417" expanded="true" signature="6565:6609" ph="SELECT missi... missing_value" />
+                <marker date="1513213343076" expanded="true" signature="4866:5054" ph="CREATE TABLE... missing_value" />
+                <marker date="1513213343076" expanded="true" signature="5946:5979" ph="INSERT INTO missing_value... " />
+                <marker date="1513213343076" expanded="true" signature="6715:6759" ph="SELECT missi... missing_value" />
               </folding>
             </state>
           </provider>
@@ -77,8 +50,8 @@
         <option value="$USER_HOME$/XDB4/Emailing.py" />
         <option value="$USER_HOME$/XDB4/XTC3.py" />
         <option value="$PROJECT_DIR$/fin_Info.py" />
-        <option value="$PROJECT_DIR$/fin.py" />
         <option value="$PROJECT_DIR$/../../../Git/LinkedIn - Copy/LinkedInPageScrapAstrayPurple.py" />
+        <option value="$PROJECT_DIR$/fin.py" />
       </list>
     </option>
   </component>
@@ -89,8 +62,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="4" />
-    <option name="y" value="28" />
+    <option name="x" value="531" />
+    <option name="y" value="77" />
     <option name="width" value="1936" />
     <option name="height" value="1092" />
   </component>
@@ -385,7 +358,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="4" y="28" width="1936" height="1092" extended-state="1" />
+    <frame x="531" y="77" width="1936" height="1092" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19270833" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -428,9 +401,9 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#91#0" expanded="true" />
-            <marker date="1513145730417" expanded="true" signature="4811:4999" ph="CREATE TABLE... missing_value" />
-            <marker date="1513145730417" expanded="true" signature="5891:5924" ph="INSERT INTO missing_value... " />
-            <marker date="1513145730417" expanded="true" signature="6565:6609" ph="SELECT missi... missing_value" />
+            <marker date="1513213343076" expanded="true" signature="4866:5054" ph="CREATE TABLE... missing_value" />
+            <marker date="1513213343076" expanded="true" signature="5946:5979" ph="INSERT INTO missing_value... " />
+            <marker date="1513213343076" expanded="true" signature="6715:6759" ph="SELECT missi... missing_value" />
           </folding>
         </state>
       </provider>
@@ -465,9 +438,9 @@
           <caret line="8" column="44" lean-forward="true" selection-start-line="8" selection-start-column="44" selection-end-line="8" selection-end-column="44" />
           <folding>
             <element signature="e#0#91#0" expanded="true" />
-            <marker date="1513145730417" expanded="true" signature="4811:4999" ph="CREATE TABLE... missing_value" />
-            <marker date="1513145730417" expanded="true" signature="5891:5924" ph="INSERT INTO missing_value... " />
-            <marker date="1513145730417" expanded="true" signature="6565:6609" ph="SELECT missi... missing_value" />
+            <marker date="1513213343076" expanded="true" signature="4866:5054" ph="CREATE TABLE... missing_value" />
+            <marker date="1513213343076" expanded="true" signature="5946:5979" ph="INSERT INTO missing_value... " />
+            <marker date="1513213343076" expanded="true" signature="6715:6759" ph="SELECT missi... missing_value" />
           </folding>
         </state>
       </provider>
@@ -486,9 +459,9 @@
           <caret line="8" column="44" lean-forward="true" selection-start-line="8" selection-start-column="44" selection-end-line="8" selection-end-column="44" />
           <folding>
             <element signature="e#0#91#0" expanded="true" />
-            <marker date="1513145730417" expanded="true" signature="4811:4999" ph="CREATE TABLE... missing_value" />
-            <marker date="1513145730417" expanded="true" signature="5891:5924" ph="INSERT INTO missing_value... " />
-            <marker date="1513145730417" expanded="true" signature="6565:6609" ph="SELECT missi... missing_value" />
+            <marker date="1513213343076" expanded="true" signature="4866:5054" ph="CREATE TABLE... missing_value" />
+            <marker date="1513213343076" expanded="true" signature="5946:5979" ph="INSERT INTO missing_value... " />
+            <marker date="1513213343076" expanded="true" signature="6715:6759" ph="SELECT missi... missing_value" />
           </folding>
         </state>
       </provider>
@@ -531,13 +504,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/fin.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="426" column="38" lean-forward="true" selection-start-line="426" selection-start-column="38" selection-end-line="426" selection-end-column="38" />
+        <state relative-caret-position="-1414">
+          <caret line="13" column="31" lean-forward="false" selection-start-line="13" selection-start-column="31" selection-end-line="13" selection-end-column="31" />
           <folding>
             <element signature="e#0#91#0" expanded="true" />
-            <marker date="1513145730417" expanded="true" signature="4811:4999" ph="CREATE TABLE... missing_value" />
-            <marker date="1513145730417" expanded="true" signature="5891:5924" ph="INSERT INTO missing_value... " />
-            <marker date="1513145730417" expanded="true" signature="6565:6609" ph="SELECT missi... missing_value" />
+            <marker date="1513213343076" expanded="true" signature="4866:5054" ph="CREATE TABLE... missing_value" />
+            <marker date="1513213343076" expanded="true" signature="5946:5979" ph="INSERT INTO missing_value... " />
+            <marker date="1513213343076" expanded="true" signature="6715:6759" ph="SELECT missi... missing_value" />
           </folding>
         </state>
       </provider>
